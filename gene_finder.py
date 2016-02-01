@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Emma Price
-1/31/16 9:00
-This code file looks for
+Last updated: 1/31/16 9:00
 
-@author: YOUR NAME HERE
+This code file analyzes a DNA sequence and outputs snippets of DNA that are likely to be protein-coding genes
+
+@author: Emma Price
 
 """
 
