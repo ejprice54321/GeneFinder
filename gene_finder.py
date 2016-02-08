@@ -8,10 +8,10 @@ This code file analyzes a DNA sequence and outputs snippets of DNA that are like
 
 """
 
+from load import load_seq
 import random
 from amino_acids import aa, codons, aa_table   # you may find these useful
 from load import load_seq
-
 
 def shuffle_string(s):
     """Shuffles the characters in the input string
@@ -19,7 +19,6 @@ def shuffle_string(s):
         have to modify this in any way """
     return ''.join(random.sample(s, len(s)))
 
-# YOU WILL START YOUR IMPLEMENTATION FROM HERE DOWN ###
 
 def get_complement(nucleotide):
     """ Returns the complementary nucleotide
@@ -153,25 +152,38 @@ def longest_ORF(dna):
     >>> longest_ORF("ATGCGAATGTAGCATCAAA")
     'ATGCTACATTCGCAT'
     """
-    # TODO: implement this
-    pass
-
+    i = 0
+    both_ORFs = find_all_ORFs_both_strands(dna)
+    longest = both_ORFs[0]
+    while i + 1 < len(both_ORFs):
+        if len(both_ORFs[i+1]) > len(longest):
+            longest = both_ORFs[i+1]
+        i+=1
+    return longest
 
 def longest_ORF_noncoding(dna, num_trials):
     """ Computes the maximum length of the longest ORF over num_trials shuffles
         of the specfied DNA sequence
 
+        because this dna is shuffled, there is no way to run a doctest on it
+        
         dna: a DNA sequence
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
-    # TODO: implement this
-    pass
-
+    shuffled_dna = dna
+    x = 0
+    longest = 0
+    while x < num_trials:
+        shuffled_dna = shuffle_string(shuffled_dna)
+        if len(str(longest_ORF(shuffled_dna))) > longest:
+            longest = len(str(longest_ORF(shuffled_dna)))
+        x +=1
+    return longest
 
 def coding_strand_to_AA(dna):
     """ Computes the Protein encoded by a sequence of DNA.  This function
         does not check for start and stop codons (it assumes that the input
-        DNA sequence represents an protein coding region).
+        DNA sequence represents a protein coding region).
 
         dna: a DNA sequence represented as a string
         returns: a string containing the sequence of amino acids encoded by the
@@ -182,19 +194,33 @@ def coding_strand_to_AA(dna):
         >>> coding_strand_to_AA("ATGCCCGCTTT")
         'MPA'
     """
-    # TODO: implement this
-    pass
+    amino_acid = ''
+    i = 0
+    while i + 3 < len(dna) + 1:
+        amino_acid += aa_table[dna[i:i+3]]
+        i += 3
+    return amino_acid
 
 
 def gene_finder(dna):
     """ Returns the amino acid sequences that are likely coded by the specified dna
-
+        
+        because this dna is shuffled, there is no way to run a doctest on it
+        
         dna: a DNA sequence
         returns: a list of all amino acid sequences coded by the sequence dna.
     """
-    # TODO: implement this
-    pass
+    threshold = longest_ORF_noncoding(dna, 1500)
+    list_of_aminos = []
+    list_of_ORFs = find_all_ORFs_both_strands(dna)
+    for an_ORF in list_of_ORFs:
+        if an_ORF > threshold:
+            amino_acid_ORF = coding_strand_to_AA(an_ORF)
+            list_of_aminos.append(amino_acid_ORF)
+    return list_of_aminos
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    dna = load_seq("./data/X73525.fa")
+    print gene_finder(dna)
+#    import doctest
+#    doctest.testmod()
